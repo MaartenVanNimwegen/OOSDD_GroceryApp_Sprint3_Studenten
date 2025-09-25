@@ -86,5 +86,20 @@ namespace Grocery.App.ViewModels
             }
         }
 
+        [RelayCommand]
+        public void Search(string searchValue)
+        {
+            var groceryProductIds = MyGroceryListItems.Select(g => g.ProductId).ToHashSet();
+            var filteredProducts = _productService.GetAll()
+                .Where(p => !groceryProductIds.Contains(p.Id) && p.Stock > 0)
+                .Where(p => string.IsNullOrWhiteSpace(searchValue) ||
+                            p.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase));
+
+            AvailableProducts.Clear();
+            foreach (var product in filteredProducts)
+            {
+                AvailableProducts.Add(product);
+            }
+        }
     }
 }
